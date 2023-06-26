@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>UI Input Testing</title>
+</head>
+
+<body>
+    <h1>Character Replacement</h1>
+    <form>
+        <label for="string">Enter a string:</label><br>
+        <input type="text" id="string" name="string"><br>
+        <label for="k">Enter an integer k:</label><br>
+        <input type="number" id="k" name="k"><br><br>
+        <input type="button" value="Submit" onclick="calculateMaxLength()">
+    </form>
+
+    <script>
+        function calculateMaxLength() {
+            let s = document.getElementById("string").value;
+            let k = parseInt(document.getElementById("k").value);
+
+            // check if inputs are valid
+            if (s.length === 0 || isNaN(k) || s.length > 105 || !/^[A-Z]+$/.test(s)) {
+                alert("Please enter valid inputs: s should consist of only uppercase English letters and have length between 1 and 105, and k should be a non-negative integer.");
+                return;
+            }
+
+            // call characterReplacement function from Solution class
+            let solution = new Solution();
+            let maxLength = solution.characterReplacement(s, k);
+
+            // display result
+            alert("The length of the longest substring containing the same letter after performing at most " + k + " character replacements is " + maxLength + ".");
+        }
+
+        class Solution {
+            characterReplacement(s, k) {
+                let max_length = 0;
+                let left = 0;
+                let char_count = {};
+
+                for (let right = 0; right < s.length; right++) {
+                    char_count[s[right]] = char_count[s[right]] ? char_count[s[right]] + 1 : 1;
+
+                    let max_char_count = Math.max(...Object.values(char_count));
+
+                    let replace_count = (right - left + 1) - max_char_count;
+
+                    while (replace_count > k) {
+                        char_count[s[left]] -= 1;
+                        left += 1;
+                        replace_count = (right - left + 1) - Math.max(...Object.values(char_count));
+                    }
+
+                    max_length = Math.max(max_length, right - left + 1);
+                }
+
+                return max_length;
+            }
+        }
+    </script>
+</body>
+
+</html>
